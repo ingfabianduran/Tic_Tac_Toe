@@ -78,6 +78,7 @@ class TableroController extends Controller
             $tableroActualizado = Tablero::find($id);
             $partidaActual = Partida::find($tableroActualizado->partida_id);
             if ($this->validateGanador($tableroActualizado)) {
+                $tableroFinalizado = Tablero::where('id', $tableroActualizado->id)->update(['campo_1' => 'F', 'campo_2' => 'F', 'campo_3' => 'F', 'campo_4' => 'F', 'campo_5' => 'F', 'campo_6' => 'F', 'campo_7' => 'F', 'campo_8' => 'F', 'campo_9' => 'F']);
                 $partidaActual->ganador = $partidaActual->turno === 1 ? $partidaActual->jugador_1 : $partidaActual->jugador_2;
                 $partidaActual->save();
                 $tableroActualizado = Tablero::find($id);
