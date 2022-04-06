@@ -73,16 +73,19 @@ class TableroController extends Controller
      */
     public function update(Request $request, $id, $nameCampo, $clear = '0')
     {
+        // Si el tablero no se va a limpiar, se ejecutara las acciones del juego
         if ($clear === '0') {
             $tableroJugado = Tablero::where('id', $id)->update([$nameCampo => $request->valueCampo]);
             $tableroActualizado = Tablero::find($id);
             $partidaActual = Partida::find($tableroActualizado->partida_id);
+            // Valida si existe o no un jugador:
             if ($this->validateGanador($tableroActualizado)) {
                 $tableroFinalizado = Tablero::where('id', $tableroActualizado->id)->update(['campo_1' => 'F', 'campo_2' => 'F', 'campo_3' => 'F', 'campo_4' => 'F', 'campo_5' => 'F', 'campo_6' => 'F', 'campo_7' => 'F', 'campo_8' => 'F', 'campo_9' => 'F']);
                 $partidaActual->ganador = $partidaActual->turno === 1 ? $partidaActual->jugador_1 : $partidaActual->jugador_2;
                 $partidaActual->save();
                 $tableroActualizado = Tablero::find($id);
             } else {
+                // Si no hay ganador se actualiza el turno:
                 $partidaActual->turno = $partidaActual->turno === 1 ? 2 : 1;
                 $partidaActual->save();
                 $tableroActualizado = Tablero::find($id);
@@ -91,6 +94,7 @@ class TableroController extends Controller
                 'tablero' => $tableroActualizado
             ]);
         } else {
+            // Se reinician todos los valores del tablero:
             $tableroActualizado = Tablero::find($id);
             $tableroJugado = $this->clearTablero($tableroActualizado->partida_id, $id);
             return response()->json([
@@ -99,6 +103,7 @@ class TableroController extends Controller
         }
     }
 
+    // Existe ganador:
     public function validateGanador($tableroActualizado) {
         if ($this->existeGanadorInRow($tableroActualizado)) return true;
         if ($this->existeGanadorInCol($tableroActualizado)) return true;
@@ -106,6 +111,7 @@ class TableroController extends Controller
         return false;
     }
 
+    // Reinicio de la partida y de todo el tablero:
     public function clearTablero($idPartida, $idTablero) {
         $tableroLimpio = Tablero::where('id', $idTablero)->update(['campo_1' => '-', 'campo_2' => '-', 'campo_3' => '-', 'campo_4' => '-', 'campo_5' => '-', 'campo_6' => '-', 'campo_7' => '-', 'campo_8' => '-', 'campo_9' => '-']);
         $partidaLimpia = Partida::where('id', $idPartida)->update(['ganador' => null, 'turno' => 1]);
@@ -113,6 +119,7 @@ class TableroController extends Controller
         return $tableroActualizado;
     }
 
+    // Detectar ganador en las filas:
     public function existeGanadorInRow($tablero) {
         if ($tablero->campo_1 !== '-' && $tablero->campo_2 !== '-' && $tablero->campo_3 !== '-') {
             if ($tablero->campo_1 === $tablero->campo_2  && $tablero->campo_1 === $tablero->campo_3) {
@@ -133,6 +140,7 @@ class TableroController extends Controller
         }
     }
 
+    // Detectar ganador en las columnas:
     public function existeGanadorInCol($tablero) {
         if ($tablero->campo_1 !== '-' && $tablero->campo_4 !== '-' && $tablero->campo_7 !== '-') {
             if ($tablero->campo_1 === $tablero->campo_4  && $tablero->campo_1 === $tablero->campo_7) {
@@ -153,6 +161,7 @@ class TableroController extends Controller
         }
     }
 
+    // Detectar ganador en las diagonales:
     public function existeGanadorInDia($tablero) {
         if ($tablero->campo_1 !== '-' && $tablero->campo_5 !== '-' && $tablero->campo_9 !== '-') {
             if ($tablero->campo_1 === $tablero->campo_5  && $tablero->campo_1 === $tablero->campo_9) {
