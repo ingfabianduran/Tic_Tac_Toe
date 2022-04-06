@@ -5,3 +5,7 @@ Para la ejecucion del proyecto es necesario tener un servidor apache con mysql 5
 ## Frontend
 
 El compilado del frontend esta en la carpeta raiz del proyecto de Laravel. Por favor copiar y pegar esta carpeta en la raiz del servidor apache y acceder a la url http://localhost/build/ con el servidor de laravel arriba. 
+
+## Archivo Env
+
+No olvidar configurar el archivo .env para las configuraciones globales del proyecto. 
